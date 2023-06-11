@@ -93,9 +93,9 @@ animation_frames = int(np.floor(2 * total_points / points_per_frame))
 
 def combined_update(i):
     # Double the number of frames to accommodate for the unplotting
-
     i *= 2 * points_per_frame
-    if i < total_points:
+
+    if i < total_points - 1:
         # We are in the first half of the animation, so plot the points
         if i < len(x_data_1):
             curve_1.set_data(x_data_1[:i], y_data_1[:i])
@@ -106,13 +106,17 @@ def combined_update(i):
         # We are in the second half of the animation, so unplot the points
         i -= total_points
         end_points = total_points - i
-        if end_points > len(x_data_1):
-            curve_2.set_data(x_petals[:end_points - len(x_data_1)], y_petals[:end_points - len(x_data_1)])
-            curve_3.set_data(x_seeds[:end_points - len(x_data_1)], y_seeds[:end_points - len(x_data_1)])
+
+        if end_points > 0:
+            if end_points > len(x_data_1):
+                curve_2.set_data(x_petals[:end_points - len(x_data_1)], y_petals[:end_points - len(x_data_1)])
+                curve_3.set_data(x_seeds[:end_points - len(x_data_1)], y_seeds[:end_points - len(x_data_1)])
+            else:
+                curve_2.set_data([], [])
+                curve_3.set_data([], [])
+                curve_1.set_data(x_data_1[:end_points], y_data_1[:end_points])
         else:
-            curve_1.set_data(x_data_1[:end_points], y_data_1[:end_points])
-            curve_2.set_data([], [])
-            curve_3.set_data([], [])
+            curve_1.set_data([], [])
 
     return curve_1, curve_2, curve_3
 
