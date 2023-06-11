@@ -88,8 +88,6 @@ points_per_frame = total_points // (animation_seconds * fps)
 
 animation_frames = int(np.floor(total_points / points_per_frame))
 
-print(animation_frames)
-
 def combined_update(i):
     # print(i, animation_frames, i * 2 * points_per_frame, i * 2 * points_per_frame >= total_points)
     # Calculate the index for plotting/unplotting
