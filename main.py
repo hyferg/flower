@@ -2,39 +2,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-fps = 24
-animation_seconds = 5
+# Constants
+fps = 60
+animation_seconds = 3
 num_points = 10000
 
 loops = 30
 num_petals = 5
-rotation = 1/4 * np.pi
+petal_rotation = 1/4 * np.pi
+
+# Generate the stem curve
+squish = 4
+gammas = np.linspace(0, 2 * np.pi / squish, num_points)
+x = gammas
+y = 0.25 * np.sin(gammas * squish)
+stem_theta = 1 / 2 * np.pi
+x_data_1 = x * np.cos(stem_theta) - y * np.sin(stem_theta)
+y_data_1 = x * np.sin(stem_theta) + y * np.cos(stem_theta) - 2 * np.pi / squish
 
 # Generating loops of angles from 0 to 2 pi
 thetas = np.linspace(0, loops * 2 * np.pi - 1e-10, num_points)
 
 # Generating amplitudes for each curve
-amp_petals = np.vectorize(lambda theta: (np.cos(num_petals * (theta + rotation)) + 1) / 2)(thetas)
+amp_petals = np.vectorize(lambda theta: (np.cos(num_petals * (theta + petal_rotation)) + 1) / 2)(thetas)
 amp_seeds = np.vectorize(lambda theta: 0.25)(thetas)
 
 # Concentric levels for each loop beyond 2 pi
 levels = (1 + np.floor_divide(thetas, 2 * np.pi)) / loops
 
 # Generating complex numbers on the unit circle for each curve
-z_petals = levels * amp_petals * np.exp(1j * thetas)
-z_seeds = levels * amp_seeds * np.exp(1j * thetas)
-
-# Generate the stem curve
-squish = 4
-gammas = np.linspace(0, 2 * np.pi / squish, num_points)
-
-x = gammas
-y = 0.25 * np.sin(gammas*squish)
-
-theta = 1/2 * np.pi
-
-x_data_1 = x * np.cos(theta) - y * np.sin(theta)
-y_data_1 = x * np.sin(theta) + y * np.cos(theta) - 2 * np.pi / squish
+z_petals = 0.7 * levels * amp_petals * np.exp(1j * thetas)
+z_seeds = 0.7 * levels * amp_seeds * np.exp(1j * thetas)
 
 # Extracting real and imaginary parts for each curve
 x_petals = np.real(z_petals)
@@ -88,35 +86,35 @@ total_points = len(x_data_1) + len(x_petals) + len(x_seeds)
 
 points_per_frame = total_points // (animation_seconds * fps)
 
-animation_frames = int(np.floor(2 * total_points / points_per_frame))
+animation_frames = int(np.floor(total_points / points_per_frame))
 
+print(animation_frames)
 
 def combined_update(i):
-    # Double the number of frames to accommodate for the unplotting
+    # print(i, animation_frames, i * 2 * points_per_frame, i * 2 * points_per_frame >= total_points)
+    # Calculate the index for plotting/unplotting
     i *= 2 * points_per_frame
 
-    if i < total_points - 1:
-        # We are in the first half of the animation, so plot the points
-        if i < len(x_data_1):
-            curve_1.set_data(x_data_1[:i], y_data_1[:i])
-        else:
-            curve_2.set_data(x_petals[:i-len(x_data_1)], y_petals[:i-len(x_data_1)])
-            curve_3.set_data(x_seeds[:i-len(x_data_1)], y_seeds[:i-len(x_data_1)])
-    else:
+    if i >= total_points:
         # We are in the second half of the animation, so unplot the points
         i -= total_points
         end_points = total_points - i
 
-        if end_points > 0:
-            if end_points > len(x_data_1):
-                curve_2.set_data(x_petals[:end_points - len(x_data_1)], y_petals[:end_points - len(x_data_1)])
-                curve_3.set_data(x_seeds[:end_points - len(x_data_1)], y_seeds[:end_points - len(x_data_1)])
-            else:
-                curve_2.set_data([], [])
-                curve_3.set_data([], [])
-                curve_1.set_data(x_data_1[:end_points], y_data_1[:end_points])
+        if end_points > len(x_data_1):
+            curve_2.set_data(x_petals[:end_points - len(x_data_1)], y_petals[:end_points - len(x_data_1)])
+            curve_3.set_data(x_seeds[:end_points - len(x_data_1)], y_seeds[:end_points - len(x_data_1)])
         else:
-            curve_1.set_data([], [])
+            curve_2.set_data([], [])
+            curve_3.set_data([], [])
+            curve_1.set_data(x_data_1[:end_points], y_data_1[:end_points])
+    else:
+        # We are in the first half of the animation, so plot the points
+        if i < len(x_data_1):
+            curve_1.set_data(x_data_1[:i], y_data_1[:i])
+        else:
+            rem_i = i - len(x_data_1)
+            curve_2.set_data(x_petals[:rem_i], y_petals[:rem_i])
+            curve_3.set_data(x_seeds[:rem_i], y_seeds[:rem_i])
 
     return curve_1, curve_2, curve_3
 
