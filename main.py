@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 fps = 24
-animation_seconds = 2
+animation_seconds = 5
 num_points = 10000
 
 loops = 30
@@ -73,7 +73,7 @@ for spine in ax.spines.values():
     spine.set_visible(False)
 
 # Create empty curves
-curve_1, = ax.plot([], [], '#37C71E', linewidth=8)
+curve_1, = ax.plot([], [], '#37C71E', linewidth=5)
 curve_2, = ax.plot([], [], '#FAF9F6', linewidth=4)
 curve_3, = ax.plot([], [], '#F7A014', linewidth=4)
 
@@ -84,20 +84,40 @@ def init():
     curve_3.set_data([], [])
     return curve_1, curve_2, curve_3
 
-points_per_frame = len(x_data_1) // (animation_seconds * fps)
+total_points = len(x_data_1) + len(x_petals) + len(x_seeds)
 
-# Update function
-def update(i):
-    # Add the i-th point to each curve
-    i *= points_per_frame
-    curve_1.set_data(x_data_1[:i], y_data_1[:i])
-    curve_2.set_data(x_petals[:i], y_petals[:i])
-    curve_3.set_data(x_seeds[:i], y_seeds[:i])
+points_per_frame = total_points // (animation_seconds * fps)
+
+animation_frames = int(np.floor(2 * total_points / points_per_frame))
+
+
+def combined_update(i):
+    # Double the number of frames to accommodate for the unplotting
+
+    i *= 2 * points_per_frame
+    if i < total_points:
+        # We are in the first half of the animation, so plot the points
+        if i < len(x_data_1):
+            curve_1.set_data(x_data_1[:i], y_data_1[:i])
+        else:
+            curve_2.set_data(x_petals[:i-len(x_data_1)], y_petals[:i-len(x_data_1)])
+            curve_3.set_data(x_seeds[:i-len(x_data_1)], y_seeds[:i-len(x_data_1)])
+    else:
+        # We are in the second half of the animation, so unplot the points
+        i -= total_points
+        end_points = total_points - i
+        if end_points > len(x_data_1):
+            curve_2.set_data(x_petals[:end_points - len(x_data_1)], y_petals[:end_points - len(x_data_1)])
+            curve_3.set_data(x_seeds[:end_points - len(x_data_1)], y_seeds[:end_points - len(x_data_1)])
+        else:
+            curve_1.set_data(x_data_1[:end_points], y_data_1[:end_points])
+            curve_2.set_data([], [])
+            curve_3.set_data([], [])
 
     return curve_1, curve_2, curve_3
 
 # Create the animation
-ani = FuncAnimation(fig, update, frames=int(np.floor(len(x_data_1) / points_per_frame)), init_func=init, blit=True, interval=1000/fps)
+ani = FuncAnimation(fig, combined_update, frames=animation_frames, init_func=init, blit=True, interval=1000/fps)
 
 # Show the animation
 plt.show()
