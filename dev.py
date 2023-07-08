@@ -58,20 +58,28 @@ x_2_pre = np.linspace(0.15, 2, 100)[:100]
 y_2_pre = (lambda x: x ** x)(x_2_pre)
 x_2, y_2 = chart(x_2_pre, y_2_pre, np.pi / 2.3, (-0.9 * 0.8, -0.9 * 0.8), True, 0.8)
 
-x_3_pre = np.linspace(0.15, 1.75, 100)[:100]
+x_3_pre = np.linspace(0.15, 1.8, 100)[:100]
 y_3_pre = (lambda x: x ** x)(x_3_pre)
-x_3, y_3 = chart(x_3_pre, y_3_pre, np.pi / 2.3, (-3 * 0.8, -0.9 * 0.8), True, 0.8)
+x_3, y_3 = chart(x_3_pre, y_3_pre, np.pi / 2.35, (-3 * 0.8, -0.98 * 0.8), True, 0.8)
 
 x_4_pre = np.linspace(-5, 4, 100)
 y_4_pre = (lambda x: np.e ** x)(x_4_pre)
 x_4, y_4 = chart(x_4_pre, y_4_pre, 0, (-5.5, -1.65), True, 0.1)
 
-x_name = np.concatenate((x_1, [None], x_2, [None], x_3, [None], x_4))
-y_name = np.concatenate((y_1, [None], y_2, [None], y_3, [None], y_4))
+x_5_pre = np.linspace(0, 2.5, 100)[:90]
+y_5_pre = (lambda x: x ** x / 3)(x_5_pre)
+x_5, y_5 = chart(x_5_pre, y_5_pre, np.pi / 2.1, (-7.0, -0.8), True, 1.2)
+
+x_6_pre = np.linspace(0, 5, 100)
+y_6_pre = 0 * x_6_pre
+x_6, y_6 = chart(x_6_pre, y_6_pre, np.pi / 2, (-10, -1.2))
+
+x_name = np.concatenate((x_1, [None], x_2, [None], x_3, [None], x_4, [None], x_5, [None], x_6))
+y_name = np.concatenate((y_1, [None], y_2, [None], y_3, [None], y_4, [None], y_5, [None], y_6))
 
 # Create an empty figure and axes
 fig, ax = plt.subplots()
-ax_scale = 8
+ax_scale = 15
 ax.set_xlim(-ax_scale, ax_scale)
 ax.set_ylim(-ax_scale, ax_scale)
 
