@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 # Constants
-num_petals = 5
+num_petals_in_flower = 5
 petal_rotation = 1 / 4 * np.pi
 petal_fill_loops = 30
 
@@ -28,7 +28,7 @@ y_stem = x_pre * np.sin(stem_rotation) + y_pre * np.cos(stem_rotation) - 2 * np.
 thetas = np.linspace(0, petal_fill_loops * 2 * np.pi - 1e-10, num_points)
 
 # Generating amplitudes for each curve
-amp_petals = np.vectorize(lambda theta: (np.cos(num_petals * (theta + petal_rotation)) + 1) / 2)(thetas)
+amp_petals = np.vectorize(lambda theta: (np.cos(num_petals_in_flower * (theta + petal_rotation)) + 1) / 2)(thetas)
 amp_seeds = np.vectorize(lambda theta: 0.25)(thetas)
 
 # Concentric levels for each loop beyond 2 pi
@@ -56,9 +56,11 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
 
 segment_points = 10000
 
-meta_args = [0, (4.0, -1.1), False, 0.35]
-
 # sara.jpg
+
+# scale and shift args for the full name
+meta_args = [0, (5.0, -1.1), False, 0.35]
+
 x_1_pre = np.linspace(0.2, 3, segment_points)[:int(0.67 * segment_points)]
 y_1_pre = (lambda x: x ** x - x)(x_1_pre)
 x_1, y_1 = chart(*chart(x_1_pre, y_1_pre, np.pi / 2.3, (0.25, -0.1), True), *meta_args)
@@ -83,11 +85,8 @@ x_6_pre = np.linspace(0, 5, segment_points)
 y_6_pre = 0 * x_6_pre
 x_6, y_6 = chart(*chart(x_6_pre, y_6_pre, np.pi / 1.95, (-10, -1.2)), *meta_args)
 
-x_shift = 1
-y_shift = 0
-
-x_name = np.concatenate((x_1 + x_shift, [None], x_2 + x_shift, [None], x_3 + x_shift, [None], x_4 + x_shift, [None],
-                         x_5 + x_shift, [None], x_6 + x_shift))
+x_name = np.concatenate((x_1, [None], x_2, [None], x_3, [None], x_4, [None],
+                         x_5, [None], x_6))
 y_name = np.concatenate((y_1, [None], y_2, [None], y_3, [None], y_4, [None], y_5, [None], y_6))
 
 # Create an empty figure and axes
@@ -138,21 +137,19 @@ total_frames = grow_frames + pause_frames + shrink_frames
 
 num_name = len(x_name)
 num_stem = len(x_stem)
-num_petals = len(x_petals)
-num_seeds = len(x_seeds)
-num_total = num_name + num_stem + num_petals + num_seeds
+num_petals_seeds = len(x_petals)
+num_total = num_name + num_stem + num_petals_seeds
 
 stem_pre = [None] * num_name
-stem_post = [None] * (num_petals + num_seeds)
+stem_post = [None] * num_petals_seeds
 x_stem_padded = np.concatenate((stem_pre, x_stem, stem_post))
 y_stem_padded = np.concatenate((stem_pre, y_stem, stem_post))
 
 petals_pre = [None] * (num_name + num_stem)
-petals_post = [None] * num_seeds
-x_petals_padded = np.concatenate((petals_pre, x_petals, petals_post))
-y_petals_padded = np.concatenate((petals_pre, y_petals, petals_post))
+x_petals_padded = np.concatenate((petals_pre, x_petals))
+y_petals_padded = np.concatenate((petals_pre, y_petals))
 
-seeds_pre = [None] * (num_name + num_stem + num_petals)
+seeds_pre = [None] * (num_name + num_stem)
 x_seeds_padded = np.concatenate((seeds_pre, x_seeds))
 y_seeds_padded = np.concatenate((seeds_pre, y_seeds))
 
