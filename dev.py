@@ -59,7 +59,7 @@ segment_points = 5000
 # sara.jpg
 
 # scale and shift args for the full name
-meta_args = [0, (5.0, -1.1), False, 0.35]
+meta_args = [0, (5.3, -1.095), False, 0.35]
 
 x_1_pre = np.linspace(0.2, 3, segment_points)[:int(0.67 * segment_points)]
 y_1_pre = (lambda x: x ** x - x)(x_1_pre)
@@ -83,19 +83,19 @@ x_5, y_5 = chart(*chart(x_5_pre, y_5_pre, np.pi / 2.1, (-6.9, -0.8), True, 1.2),
 
 x_6_pre = np.linspace(0, 5, segment_points)
 y_6_pre = 0 * x_6_pre
-x_6, y_6 = chart(*chart(x_6_pre, y_6_pre, np.pi / 1.95, (-10, -1.2)), *meta_args)
+x_6, y_6 = chart(*chart(x_6_pre, y_6_pre, np.pi / 1.95, (-10, -1.4)), *meta_args)
 
-x_name = np.concatenate((x_1, [None], x_2, [None], x_3, [None], x_4, [None],
-                         x_5, [None], x_6))
+x_name = np.concatenate((x_1, [None], x_2, [None], x_3, [None], x_4, [None], x_5, [None], x_6))
 y_name = np.concatenate((y_1, [None], y_2, [None], y_3, [None], y_4, [None], y_5, [None], y_6))
 
 # Create an empty figure and axes
 fig, ax = plt.subplots()
 
-ax_scale = 3
-x_shift = 2.15
+ax_scale = 3.2
+x_shift = 2.25
+y_shift = -0.5
 ax.set_xlim(-ax_scale + x_shift, ax_scale + x_shift)
-ax.set_ylim(-ax_scale, ax_scale)
+ax.set_ylim(-ax_scale + y_shift, ax_scale + y_shift)
 
 plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 
@@ -114,7 +114,7 @@ for spine in ax.spines.values():
     spine.set_visible(False)
 
 # Create empty curves
-curve_0, = ax.plot([], [], '#F7A014', linewidth=4)
+curve_0, = ax.plot([], [], '#F7A014', linewidth=5)
 curve_1, = ax.plot([], [], '#37C71E', linewidth=5)
 curve_2, = ax.plot([], [], '#FAF9F6', linewidth=4)
 curve_3, = ax.plot([], [], '#F7A014', linewidth=4)
