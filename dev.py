@@ -1,14 +1,17 @@
+import math
+
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 # Constants
 num_petals = 5
 petal_rotation = 1 / 4 * np.pi
 petal_fill_loops = 30
 
-fps = 60
-animation_seconds = 3
 num_points = 10000
+fps = 60
+animation_seconds = 4
 
 # Generate the stem curve
 squish = 4
@@ -49,9 +52,9 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
     return x_out, y_out
 
 
-segment_points = 1000
+segment_points = 100
 
-# name
+# sara.jpg
 x_1_pre = np.linspace(0.2, 3, segment_points)[:int(0.67 * segment_points)]
 y_1_pre = (lambda x: x ** x - x)(x_1_pre)
 x_1, y_1 = chart(x_1_pre, y_1_pre, np.pi / 2.3, (0.25, -0.1), True)
@@ -100,15 +103,34 @@ for spine in ax.spines.values():
     spine.set_visible(False)
 
 # Create empty curves
-curve_1, = ax.plot([], [], '#37C71E', linewidth=5)
-curve_2, = ax.plot([], [], '#FAF9F6', linewidth=4)
+# curve_1, = ax.plot([], [], '#37C71E', linewidth=5)
+# curve_2, = ax.plot([], [], '#FAF9F6', linewidth=4)
 curve_3, = ax.plot([], [], '#F7A014', linewidth=4)
-curve_4, = ax.plot([], [], '#F7A014', linewidth=4)
+# curve_4, = ax.plot([], [], '#F7A014', linewidth=4)
 
 # curve_1.set_data(x_stem, y_stem)
 # curve_2.set_data(x_petals, y_petals)
 # curve_3.set_data(x_seeds, y_seeds)
 curve_3.set_data(x_name, y_name)
+
+
+def init():
+    curve_3.set_data([], [])
+    # curve_3.set_data(x_name, y_name)
+    return curve_3,
+
+
+def combined_update(i):
+    pct_complete = i / animation_frames
+    end_pt = int(pct_complete * len(x_name))
+    curve_3.set_data(x_name[:end_pt], y_name[:end_pt])
+    print(i)
+    return curve_3,
+
+
+animation_frames = int(animation_seconds * fps)
+
+ani = FuncAnimation(fig, combined_update, frames=animation_frames, init_func=init, blit=True, interval=1000 / fps)
 
 # Show the animation
 plt.show()
