@@ -142,12 +142,11 @@ num_total = num_name + num_stem + num_petals_seeds
 
 # Pad the stem to wait for name curve to plot
 stem_pre = [None] * num_name
-stem_post = [None] * num_petals_seeds
-x_stem_padded = np.concatenate((stem_pre, x_stem, stem_post))
-y_stem_padded = np.concatenate((stem_pre, y_stem, stem_post))
+x_stem_padded = np.concatenate((stem_pre, x_stem))
+y_stem_padded = np.concatenate((stem_pre, y_stem))
 
 # Animate the petals and seeds at the same time
-# Pad the petals and seeds to wait for name curve and stem to animate
+# Pad the petals and seeds to wait for name and stem to animate
 petals_seeds_pre = [None] * (num_name + num_stem)
 x_petals_padded = np.concatenate((petals_seeds_pre, x_petals))
 y_petals_padded = np.concatenate((petals_seeds_pre, y_petals))
