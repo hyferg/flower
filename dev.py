@@ -11,7 +11,8 @@ petal_fill_loops = 30
 
 num_points = 10000
 fps = 60
-animation_seconds = 4
+animation_seconds = 1
+pause_seconds = 1
 
 # Generate the stem curve
 squish = 4
@@ -120,17 +121,27 @@ def init():
     return curve_3,
 
 
+grow_frames = int(animation_seconds * fps)
+pause_frames = int(pause_seconds * fps)
+shrink_frames = int(animation_seconds * fps)
+total_frames = grow_frames + pause_frames + shrink_frames
+
+
 def combined_update(i):
-    pct_complete = i / animation_frames
-    end_pt = int(pct_complete * len(x_name))
+    if i < grow_frames + pause_frames:
+        pct_complete = i / grow_frames
+        end_pt = int(pct_complete * len(x_name))
+    else:
+        pct_complete = (i - grow_frames - pause_frames) / shrink_frames
+        end_pt = int((1 - pct_complete) * len(x_name))
+
     curve_3.set_data(x_name[:end_pt], y_name[:end_pt])
+
     print(i)
     return curve_3,
 
 
-animation_frames = int(animation_seconds * fps)
-
-ani = FuncAnimation(fig, combined_update, frames=animation_frames, init_func=init, blit=True, interval=1000 / fps)
+ani = FuncAnimation(fig, combined_update, frames=total_frames, init_func=init, blit=True, interval=1000 / fps)
 
 # Show the animation
 plt.show()
