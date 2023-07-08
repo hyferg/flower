@@ -58,7 +58,7 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
 segment_points = 5000
 
 # scale and shift args for the full name
-meta_args = [0, (5.3, -1.095), False, 0.35]
+meta_args = [0, (5.2, -1.1), False, 0.35]
 
 x_1_pre = np.linspace(0.2, 3, segment_points)[:int(0.67 * segment_points)]
 y_1_pre = (lambda x: x ** x - x)(x_1_pre)
