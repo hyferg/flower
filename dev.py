@@ -11,9 +11,9 @@ petal_fill_loops = 30
 
 num_points = 10000
 fps = 60
-grow_seconds = 3
+grow_seconds = 5
 pause_seconds = 2
-shrink_seconds = 0.75
+shrink_seconds = 1
 
 # Generate the stem curve
 squish = 4
@@ -54,7 +54,7 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
     return x_out, y_out
 
 
-segment_points = 10000
+segment_points = 5000
 
 # sara.jpg
 
@@ -114,20 +114,18 @@ for spine in ax.spines.values():
     spine.set_visible(False)
 
 # Create empty curves
+curve_0, = ax.plot([], [], '#F7A014', linewidth=4)
 curve_1, = ax.plot([], [], '#37C71E', linewidth=5)
 curve_2, = ax.plot([], [], '#FAF9F6', linewidth=4)
 curve_3, = ax.plot([], [], '#F7A014', linewidth=4)
-curve_4, = ax.plot([], [], '#F7A014', linewidth=4)
-
-curve_1.set_data(x_stem, y_stem)
 
 
 def init():
+    curve_0.set_data([], [])
     curve_1.set_data([], [])
     curve_2.set_data([], [])
     curve_3.set_data([], [])
-    curve_4.set_data([], [])
-    return curve_4,
+    return curve_0, curve_1, curve_2, curve_3,
 
 
 grow_frames = int(grow_seconds * fps)
@@ -145,13 +143,11 @@ stem_post = [None] * num_petals_seeds
 x_stem_padded = np.concatenate((stem_pre, x_stem, stem_post))
 y_stem_padded = np.concatenate((stem_pre, y_stem, stem_post))
 
-petals_pre = [None] * (num_name + num_stem)
-x_petals_padded = np.concatenate((petals_pre, x_petals))
-y_petals_padded = np.concatenate((petals_pre, y_petals))
-
-seeds_pre = [None] * (num_name + num_stem)
-x_seeds_padded = np.concatenate((seeds_pre, x_seeds))
-y_seeds_padded = np.concatenate((seeds_pre, y_seeds))
+petals_seeds_pre = [None] * (num_name + num_stem)
+x_petals_padded = np.concatenate((petals_seeds_pre, x_petals))
+y_petals_padded = np.concatenate((petals_seeds_pre, y_petals))
+x_seeds_padded = np.concatenate((petals_seeds_pre, x_seeds))
+y_seeds_padded = np.concatenate((petals_seeds_pre, y_seeds))
 
 
 def slice_filter(array, end):
@@ -160,22 +156,21 @@ def slice_filter(array, end):
 
 
 def combined_update(i):
-    if i < grow_frames + pause_frames:
+    if i < grow_frames:
         pct_complete = i / grow_frames
         end_pt = int(pct_complete * num_total)
+    elif grow_frames < i < pause_frames:
+        end_pt = num_total
     else:
         pct_complete = (i - grow_frames - pause_frames) / shrink_frames
-        end_pt = int((1 - pct_complete) * len(x_name))
+        end_pt = int((1 - pct_complete) * num_total)
 
+    curve_0.set_data(x_name[:end_pt], y_name[:end_pt])
     curve_1.set_data(slice_filter(x_stem_padded, end_pt), slice_filter(y_stem_padded, end_pt))
     curve_2.set_data(slice_filter(x_petals_padded, end_pt), slice_filter(y_petals_padded, end_pt))
     curve_3.set_data(slice_filter(x_seeds_padded, end_pt), slice_filter(y_seeds_padded, end_pt))
 
-    # curve_3.set_data(x_seeds_padded[:end_pt], y_seeds_padded[:end_pt])
-    curve_4.set_data(x_name[:end_pt], y_name[:end_pt])
-
-    print(i)
-    return curve_1, curve_2, curve_3, curve_4,
+    return curve_1, curve_2, curve_3, curve_0,
 
 
 ani = FuncAnimation(fig, combined_update, frames=total_frames, init_func=init, blit=True, interval=1000 / fps)
