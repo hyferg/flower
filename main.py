@@ -13,7 +13,7 @@ grow_seconds = 5
 pause_seconds = 2
 shrink_seconds = 1
 
-# Generate the stem curve
+# Generate flower stem
 squish = 4
 gammas = np.linspace(0, 2 * np.pi / squish, num_points)
 x_pre = gammas
@@ -25,7 +25,7 @@ y_stem = x_pre * np.sin(stem_rotation) + y_pre * np.cos(stem_rotation) - 2 * np.
 # Generating loops of angles from 0 to 2 pi
 thetas = np.linspace(0, petal_fill_loops * 2 * np.pi - 1e-10, num_points)
 
-# Generating amplitudes for each curve
+# Generating amplitudes for flower petals and seeds
 amp_petals = np.vectorize(lambda theta: (np.cos(num_petals_in_flower * (theta + petal_rotation)) + 1) / 2)(thetas)
 amp_seeds = np.vectorize(lambda theta: 0.25)(thetas)
 
@@ -44,6 +44,7 @@ x_seeds = np.real(z_seeds)
 y_seeds = np.imag(z_seeds)
 
 
+# Helps place curves on R^2
 def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
     if mirror:
         x = -x
@@ -52,9 +53,9 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
     return x_out, y_out
 
 
-segment_points = 5000
-
 # sara.jpg
+
+segment_points = 5000
 
 # scale and shift args for the full name
 meta_args = [0, (5.3, -1.095), False, 0.35]
@@ -126,20 +127,29 @@ def init():
     return curve_0, curve_1, curve_2, curve_3,
 
 
+# Calculate frames
+
 grow_frames = int(grow_seconds * fps)
 pause_frames = int(pause_seconds * fps)
 shrink_frames = int(shrink_seconds * fps)
 total_frames = grow_frames + pause_frames + shrink_frames
+
+# Create padded arrays for staggered animation
 
 num_name = len(x_name)
 num_stem = len(x_stem)
 num_petals_seeds = len(x_petals)
 num_total = num_name + num_stem + num_petals_seeds
 
+# Pad the stem to wait for name curve to plot
+
 stem_pre = [None] * num_name
 stem_post = [None] * num_petals_seeds
 x_stem_padded = np.concatenate((stem_pre, x_stem, stem_post))
 y_stem_padded = np.concatenate((stem_pre, y_stem, stem_post))
+
+# Animate the petals and seeds at the same time
+# Pad the petals and seeds to wait for name curve and stem to animate
 
 petals_seeds_pre = [None] * (num_name + num_stem)
 x_petals_padded = np.concatenate((petals_seeds_pre, x_petals))
