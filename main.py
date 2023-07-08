@@ -7,36 +7,40 @@ num_petals_in_flower = 5
 petal_rotation = 1 / 4 * np.pi
 petal_fill_loops = 30
 
-num_points = 10000
 fps = 60
 grow_seconds = 5
 pause_seconds = 2
 shrink_seconds = 1
 
-# Generate flower stem
+flower_segment_points = 10000
+name_segment_points = 5000
+
+# Flower stem
 squish = 4
-gammas = np.linspace(0, 2 * np.pi / squish, num_points)
+gammas = np.linspace(0, 2 * np.pi / squish, flower_segment_points)
 x_pre = gammas
 y_pre = 0.25 * np.sin(gammas * squish)
 stem_rotation = 1 / 2 * np.pi
 x_stem = x_pre * np.cos(stem_rotation) - y_pre * np.sin(stem_rotation)
 y_stem = x_pre * np.sin(stem_rotation) + y_pre * np.cos(stem_rotation) - 2 * np.pi / squish
 
-# Generating loops of angles from 0 to 2 pi
-thetas = np.linspace(0, petal_fill_loops * 2 * np.pi - 1e-10, num_points)
+# Flower petals and seeds
 
-# Generating amplitudes for flower petals and seeds
-amp_petals = np.vectorize(lambda theta: (np.cos(num_petals_in_flower * (theta + petal_rotation)) + 1) / 2)(thetas)
-amp_seeds = np.vectorize(lambda theta: 0.25)(thetas)
+# Loops of angles from 0 to 2 pi
+thetas = np.linspace(0, petal_fill_loops * 2 * np.pi - 1e-10, flower_segment_points)
 
 # Concentric levels for each loop beyond 2 pi
 levels = (1 + np.floor_divide(thetas, 2 * np.pi)) / petal_fill_loops
 
-# Generating complex numbers on the unit circle for each curve
+# Amplitudes for flower petals and seeds
+amp_petals = np.vectorize(lambda theta: (np.cos(num_petals_in_flower * (theta + petal_rotation)) + 1) / 2)(thetas)
+amp_seeds = np.vectorize(lambda theta: 0.25)(thetas)
+
+# Complex numbers on the unit circle for each curve
 z_petals = 0.7 * levels * amp_petals * np.exp(1j * thetas)
 z_seeds = 0.7 * levels * amp_seeds * np.exp(1j * thetas)
 
-# Extracting real and imaginary parts for each curve
+# Real and imaginary parts for each curve
 x_petals = np.real(z_petals)
 y_petals = np.imag(z_petals)
 
@@ -55,32 +59,30 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
 
 # sara.jpg
 
-segment_points = 5000
-
-# scale and shift args for the full name
+# scale and shift args to move the whole name around
 meta_args = [0, (5.2, -1.1), False, 0.35]
 
-x_1_pre = np.linspace(0.2, 3, segment_points)[:int(0.67 * segment_points)]
+x_1_pre = np.linspace(0.2, 3, name_segment_points)[:int(0.67 * name_segment_points)]
 y_1_pre = (lambda x: x ** x - x)(x_1_pre)
 x_1, y_1 = chart(*chart(x_1_pre, y_1_pre, np.pi / 2.3, (0.25, -0.1), True), *meta_args)
 
-x_2_pre = np.linspace(0.15, 2, segment_points)
+x_2_pre = np.linspace(0.15, 2, name_segment_points)
 y_2_pre = (lambda x: x ** x)(x_2_pre)
 x_2, y_2 = chart(*chart(x_2_pre, y_2_pre, np.pi / 2.3, (-0.9 * 0.8, -0.9 * 0.8), True, 0.8), *meta_args)
 
-x_3_pre = np.linspace(0.15, 1.7, segment_points)
+x_3_pre = np.linspace(0.15, 1.7, name_segment_points)
 y_3_pre = (lambda x: x ** x)(x_3_pre)
 x_3, y_3 = chart(*chart(x_3_pre, y_3_pre, np.pi / 2.35, (-3 * 0.8, -0.98 * 0.8), True, 0.8), *meta_args)
 
-x_4_pre = np.linspace(-5, 4, segment_points)
+x_4_pre = np.linspace(-5, 4, name_segment_points)
 y_4_pre = (lambda x: np.e ** x)(x_4_pre)
 x_4, y_4 = chart(*chart(x_4_pre, y_4_pre, 0, (-5.0, -1.64), True, 0.1), *meta_args)
 
-x_5_pre = np.linspace(0, 2.5, segment_points)[:int(0.9 * segment_points)]
+x_5_pre = np.linspace(0, 2.5, name_segment_points)[:int(0.9 * name_segment_points)]
 y_5_pre = (lambda x: x ** x / 3)(x_5_pre)
 x_5, y_5 = chart(*chart(x_5_pre, y_5_pre, np.pi / 2.1, (-6.9, -0.8), True, 1.2), *meta_args)
 
-x_6_pre = np.linspace(0, 5, segment_points)
+x_6_pre = np.linspace(0, 5, name_segment_points)
 y_6_pre = 0 * x_6_pre
 x_6, y_6 = chart(*chart(x_6_pre, y_6_pre, np.pi / 1.95, (-10, -1.4)), *meta_args)
 
@@ -95,7 +97,6 @@ x_shift = 2.3
 y_shift = -0.5
 ax.set_xlim(-ax_scale + x_shift, ax_scale + x_shift)
 ax.set_ylim(-ax_scale + y_shift, ax_scale + y_shift)
-
 plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 
 # Set background color
@@ -127,22 +128,19 @@ def init():
     return curve_0, curve_1, curve_2, curve_3,
 
 
-# Calculate frames
-
+# Calculate number of frames
 grow_frames = int(grow_seconds * fps)
 pause_frames = int(pause_seconds * fps)
 shrink_frames = int(shrink_seconds * fps)
 total_frames = grow_frames + pause_frames + shrink_frames
 
-# Create padded arrays for staggered animation
-
+# Calculate numer of points in each curve
 num_name = len(x_name)
 num_stem = len(x_stem)
 num_petals_seeds = len(x_petals)
 num_total = num_name + num_stem + num_petals_seeds
 
 # Pad the stem to wait for name curve to plot
-
 stem_pre = [None] * num_name
 stem_post = [None] * num_petals_seeds
 x_stem_padded = np.concatenate((stem_pre, x_stem, stem_post))
@@ -150,7 +148,6 @@ y_stem_padded = np.concatenate((stem_pre, y_stem, stem_post))
 
 # Animate the petals and seeds at the same time
 # Pad the petals and seeds to wait for name curve and stem to animate
-
 petals_seeds_pre = [None] * (num_name + num_stem)
 x_petals_padded = np.concatenate((petals_seeds_pre, x_petals))
 y_petals_padded = np.concatenate((petals_seeds_pre, y_petals))
