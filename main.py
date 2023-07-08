@@ -90,7 +90,7 @@ y_name = np.concatenate((y_1, [None], y_2, [None], y_3, [None], y_4, [None], y_5
 fig, ax = plt.subplots()
 
 ax_scale = 3.2
-x_shift = 2.25
+x_shift = 2.3
 y_shift = -0.5
 ax.set_xlim(-ax_scale + x_shift, ax_scale + x_shift)
 ax.set_ylim(-ax_scale + y_shift, ax_scale + y_shift)
