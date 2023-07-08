@@ -41,7 +41,7 @@ x_seeds = np.real(z_seeds)
 y_seeds = np.imag(z_seeds)
 
 
-def chart(x, y, theta, offset: (float, float), mirror=False, scale=1):
+def chart(x, y, theta, offset: (float, float), mirror=False, scale=1.0):
     if mirror:
         x = -x
     x_out = scale * (x * np.cos(theta) - y * np.sin(theta)) + offset[0]
@@ -49,28 +49,30 @@ def chart(x, y, theta, offset: (float, float), mirror=False, scale=1):
     return x_out, y_out
 
 
+segment_points = 1000
+
 # name
-x_1_pre = np.linspace(0.2, 3, 100)[:67]
+x_1_pre = np.linspace(0.2, 3, segment_points)[:int(0.67 * segment_points)]
 y_1_pre = (lambda x: x ** x - x)(x_1_pre)
 x_1, y_1 = chart(x_1_pre, y_1_pre, np.pi / 2.3, (0.25, -0.1), True)
 
-x_2_pre = np.linspace(0.15, 2, 100)[:100]
+x_2_pre = np.linspace(0.15, 2, segment_points)
 y_2_pre = (lambda x: x ** x)(x_2_pre)
 x_2, y_2 = chart(x_2_pre, y_2_pre, np.pi / 2.3, (-0.9 * 0.8, -0.9 * 0.8), True, 0.8)
 
-x_3_pre = np.linspace(0.15, 1.7, 100)[:100]
+x_3_pre = np.linspace(0.15, 1.7, segment_points)
 y_3_pre = (lambda x: x ** x)(x_3_pre)
 x_3, y_3 = chart(x_3_pre, y_3_pre, np.pi / 2.35, (-3 * 0.8, -0.98 * 0.8), True, 0.8)
 
-x_4_pre = np.linspace(-5, 4, 100)
+x_4_pre = np.linspace(-5, 4, segment_points)
 y_4_pre = (lambda x: np.e ** x)(x_4_pre)
 x_4, y_4 = chart(x_4_pre, y_4_pre, 0, (-5.0, -1.64), True, 0.1)
 
-x_5_pre = np.linspace(0, 2.5, 100)[:90]
+x_5_pre = np.linspace(0, 2.5, segment_points)[:int(0.9 * segment_points)]
 y_5_pre = (lambda x: x ** x / 3)(x_5_pre)
 x_5, y_5 = chart(x_5_pre, y_5_pre, np.pi / 2.1, (-6.9, -0.8), True, 1.2)
 
-x_6_pre = np.linspace(0, 5, 100)
+x_6_pre = np.linspace(0, 5, segment_points)
 y_6_pre = 0 * x_6_pre
 x_6, y_6 = chart(x_6_pre, y_6_pre, np.pi / 1.95, (-10, -1.2))
 
